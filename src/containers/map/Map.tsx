@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/indent */
 import React, { useRef, useEffect, useState } from "react";
-
+import axios from "axios";
 import mapboxgl, { Map } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import "mapbox-gl/dist/mapbox-gl.css";
 import * as Style from "./Style";
@@ -14,6 +15,20 @@ const TrafficMap = () => {
   const [lng, setLng] = useState(120.3089429);
   const [lat, setLat] = useState(22.6497724);
   const [zoom, setZoom] = useState(15);
+
+  const [allTrafficData, setAllTrafficData] = useState<
+    {
+      CityName: string;
+      RegionName: string;
+      Address: string;
+      DeptNm: string;
+      BranchNm: string;
+      Longitude: string;
+      Latitude: string;
+      direct: string;
+      limit: string;
+    }[]
+  >([]);
 
   //   const successHandler = (position: any) => {
   //     console.log(position.coords);
@@ -37,9 +52,46 @@ const TrafficMap = () => {
   //       alert("你的裝置或瀏覽器不支援定位功能");
   //     }
   //   }, []);
-
+  const getTrafficData = () => {
+    axios
+      .get("http://localhost:3000/rest/datastore/A01010000C-000674-011")
+      .then((response) => {
+        // handle success
+        // console.log(response.data.result.records);
+        const test = response.data.result.records;
+        test.shift();
+        console.log("test", test);
+        setAllTrafficData(test);
+      })
+      .catch((error) => {
+        // handle error
+        console.log(error);
+      })
+      .finally(() => {
+        // always executed
+      });
+  };
   useEffect(() => {
-    if (map.current) return; // initialize map only once
+    getTrafficData();
+  }, []);
+
+  const createAllMarker = (f: Map) => {
+    // show All Traffic Marker
+    console.log("allTrafficData", allTrafficData);
+    if (allTrafficData.length > 0) {
+      allTrafficData.forEach((items) => {
+        new mapboxgl.Marker({
+          color: "red",
+          draggable: true,
+        })
+          .setLngLat([parseFloat(items.Latitude), parseFloat(items.Longitude)])
+          .addTo(f);
+      });
+    }
+  };
+  useEffect(() => {
+    console.log("allTrafficData", allTrafficData);
+    // if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current || "",
       style: "mapbox://styles/mapbox/streets-v12",
@@ -53,21 +105,38 @@ const TrafficMap = () => {
 
     // Create a new marker.
     new mapboxgl.Marker({
-      color: "red",
+      // color: "red",
       draggable: true,
     })
       .setLngLat([lng, lat])
+      .setPopup(
+        new mapboxgl.Popup({ closeOnClick: false, closeButton: false })
+        // .setHTML("<h1>Current Location</h1>")
+      )
       .addTo(map.current);
-  });
+    // .togglePopup();
 
-  // useEffect(() => {
-  //   if (!map.current) return; // wait for map to initialize
-  //   map.current.on("move", () => {
-  //     setLng(map.current.getCenter().lng.toFixed(4));
-  //     setLat(map.current.getCenter().lat.toFixed(4));
-  //     setZoom(map.current.getZoom().toFixed(2));
-  //   });
-  // });
+    // createAllMarker(map.current);
+    if (allTrafficData.length > 0) {
+      allTrafficData.forEach((items) => {
+        new mapboxgl.Marker({
+          color: "red",
+          draggable: true,
+        })
+          .setLngLat([parseFloat(items.Longitude), parseFloat(items.Latitude)])
+          .setPopup(
+            new mapboxgl.Popup({
+              closeOnClick: false,
+              closeButton: false,
+            }).setHTML(`<h1>測速照相
+            <h2>方向: ${items.direct}</h2>
+            <h2>限速: ${items.limit}</h2>  
+            </h1>`)
+          )
+          .addTo(map.current!);
+      });
+    }
+  }, [allTrafficData]);
 
   return (
     <Style.Container>
