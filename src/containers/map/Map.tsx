@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable @typescript-eslint/indent */
 import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
@@ -12,8 +13,8 @@ mapboxgl.accessToken =
 const TrafficMap = () => {
   const mapContainer = useRef(null);
   const map = useRef<Map | null>(null);
-  const [lng, setLng] = useState(120.3089429);
-  const [lat, setLat] = useState(22.6497724);
+  const [lng, setLng] = useState<number>(12);
+  const [lat, setLat] = useState<number>(12);
   const [zoom, setZoom] = useState(15);
 
   const [allTrafficData, setAllTrafficData] = useState<
@@ -30,38 +31,50 @@ const TrafficMap = () => {
     }[]
   >([]);
 
-  //   const successHandler = (position: any) => {
-  //     console.log(position.coords);
-  //     setLng(position.coords.longitude);
-  //     setLat(position.coords.latitude);
-  //   };
+  const successHandler = (position: any) => {
+    setLng(position.coords.longitude);
+    setLat(position.coords.latitude);
+  };
 
-  //   const errorHandler = (err: any) => {
-  //     console.log(err);
-  //   };
+  const errorHandler = (err: any) => {
+    console.log(err);
+  };
 
-  //   useEffect(() => {
-  //     if ("geolocation" in navigator) {
-  //       console.log(navigator.geolocation);
-  //       navigator.geolocation.getCurrentPosition(successHandler, errorHandler, {
-  //         enableHighAccuracy: true,
-  //         timeout: 5000,
-  //         maximumAge: 0,
-  //       });
-  //     } else {
-  //       alert("你的裝置或瀏覽器不支援定位功能");
-  //     }
-  //   }, []);
+  // 取得當前位置
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      console.log(navigator.geolocation);
+      navigator.geolocation.getCurrentPosition(successHandler, errorHandler, {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      });
+    } else {
+      alert("你的裝置或瀏覽器不支援定位功能");
+    }
+  }, []);
+
   const getTrafficData = () => {
     axios
       .get("http://localhost:3000/rest/datastore/A01010000C-000674-011")
       .then((response) => {
         // handle success
         // console.log(response.data.result.records);
-        const test = response.data.result.records;
-        test.shift();
-        console.log("test", test);
-        setAllTrafficData(test);
+        const allData = response.data.result.records;
+        allData.shift();
+
+        // clean data
+        const filterData = allData.filter(
+          (items: { Latitude: string; Longitude: string }) => {
+            console.log(parseFloat(items.Latitude) - lat);
+            return (
+              parseFloat(items.Latitude) - lat < 0.5 &&
+              parseFloat(items.Longitude) - lng < 0.5
+            );
+          }
+        );
+        console.log("filterData", filterData);
+        setAllTrafficData(allData);
       })
       .catch((error) => {
         // handle error
@@ -73,22 +86,8 @@ const TrafficMap = () => {
   };
   useEffect(() => {
     getTrafficData();
-  }, []);
+  }, [lat, lng]);
 
-  const createAllMarker = (f: Map) => {
-    // show All Traffic Marker
-    console.log("allTrafficData", allTrafficData);
-    if (allTrafficData.length > 0) {
-      allTrafficData.forEach((items) => {
-        new mapboxgl.Marker({
-          color: "red",
-          draggable: true,
-        })
-          .setLngLat([parseFloat(items.Latitude), parseFloat(items.Longitude)])
-          .addTo(f);
-      });
-    }
-  };
   useEffect(() => {
     console.log("allTrafficData", allTrafficData);
     // if (map.current) return; // initialize map only once
@@ -143,6 +142,18 @@ const TrafficMap = () => {
       <Style.sidebar>
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </Style.sidebar>
+      {/* <Style.settingGroup>
+        <Style.changeLanBtn
+          onClick={() => {
+            map.current?.setLayoutProperty("country-label", "text-field", [
+              "get",
+              `name_ru`,
+            ]);
+          }}
+        >
+          Change Language
+        </Style.changeLanBtn>
+      </Style.settingGroup> */}
       <Style.MapDiv ref={mapContainer} className="map-container" />
     </Style.Container>
   );
