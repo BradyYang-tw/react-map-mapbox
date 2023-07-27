@@ -4,8 +4,12 @@ import React, { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import mapboxgl, { Map } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import "mapbox-gl/dist/mapbox-gl.css";
+import { faS, faHouse } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
 import * as Style from "./Style";
 
+library.add(faHouse);
 // eslint-disable-next-line operator-linebreak
 mapboxgl.accessToken =
   "pk.eyJ1IjoicHVuazYyMzMiLCJhIjoiY2sxMWp5a2h1MGhnazNiczd5ZTllcmJncyJ9.NnnOxXKm_rBXH4AeZ32xcA";
@@ -142,18 +146,25 @@ const TrafficMap = () => {
       <Style.sidebar>
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </Style.sidebar>
-      {/* <Style.settingGroup>
+      <Style.settingGroup>
         <Style.changeLanBtn
           onClick={() => {
-            map.current?.setLayoutProperty("country-label", "text-field", [
-              "get",
-              `name_ru`,
-            ]);
+            // map.current?.setLayoutProperty("country-label", "text-field", [
+            //   "get",
+            //   `name_ru`,
+            // ]);
+            map.current?.flyTo({
+              center: [lng, lat], // 初始中心点的经纬度
+              zoom: 15, // 初始缩放级别
+              bearing: 0, // 初始方位角
+              pitch: 0, // 初始俯仰角
+              speed: 1.2, // 动画速度，数值越大动画越快
+            });
           }}
         >
-          Change Language
+          <FontAwesomeIcon icon={faHouse} />
         </Style.changeLanBtn>
-      </Style.settingGroup> */}
+      </Style.settingGroup>
       <Style.MapDiv ref={mapContainer} className="map-container" />
     </Style.Container>
   );

@@ -35,6 +35,7 @@ module.exports = {
     'react',
   ],
   rules: {
+    'no-console': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': 'off',

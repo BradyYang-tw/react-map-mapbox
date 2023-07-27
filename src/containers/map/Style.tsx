@@ -31,5 +31,8 @@ export const changeLanBtn = styled.button`
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   font-size: 16px;
-  padding: 10px;
+  padding: 0px;
+  height: 29px;
+  width: 29px;
+  margin-right: 5px;
 `;
