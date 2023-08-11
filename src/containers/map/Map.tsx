@@ -60,7 +60,7 @@ const TrafficMap = () => {
 
   const getTrafficData = () => {
     axios
-      .get("http://localhost:3000/api/rest/datastore/A01010000C-000674-011")
+      .get("http://localhost:3000/api/v1/rest/datastore/A01010000C-000674-011")
       .then((response) => {
         // handle success
         // console.log(response.data.result.records);
