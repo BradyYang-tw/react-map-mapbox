@@ -1,11 +1,11 @@
-From node:16.15.0 AS build
+From node:18.18.0 AS build
 
 # 複製應用程式文件到容器中
 WORKDIR /app
 COPY . .
 
 # 安裝依賴和建置應用程式
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 # 使用 Nginx 映像作為最終映像

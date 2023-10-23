@@ -36,9 +36,8 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "defaults",
+      "not ie 11"
     ],
     "development": [
       "last 1 chrome version",
@@ -46,7 +45,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://od.moi.gov.tw/api/v1",
+  "proxy": "https://od.moi.gov.tw/api/v1/",
   "devDependencies": {
     "@types/mapbox-gl": "^2.7.12",
     "@typescript-eslint/eslint-plugin": "^5.62.0",

@@ -7,6 +7,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { faS, faHouse } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { getApiOrigin } from "../../utils/common";
 import * as Style from "./Style";
 
 library.add(faHouse);
@@ -60,7 +61,7 @@ const TrafficMap = () => {
 
   const getTrafficData = () => {
     axios
-      .get("http://localhost:3000/api/v1/rest/datastore/A01010000C-000674-011")
+      .get(`${getApiOrigin()}/api/v1/rest/datastore/A01010000C-000674-011`)
       .then((response) => {
         // handle success
         // console.log(response.data.result.records);
